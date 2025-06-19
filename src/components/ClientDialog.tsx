@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Client } from "@/data/mockClients";
 import { Button } from "@/components/ui/button";
@@ -93,43 +94,43 @@ export const ClientDialog = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <DialogTitle>
-                {client ? "Edit Client" : "Add New Client"}
-              </DialogTitle>
-              <DialogDescription>
-                {client
-                  ? "Update client information and save changes."
-                  : "Fill in the details to add a new client to your CRM."}
-              </DialogDescription>
-            </div>
-            {client && onNavigate && (
-              <div className="flex items-center gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onNavigate('prev')}
-                  disabled={!canNavigatePrev}
-                  className="h-8 w-8 p-0"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onNavigate('next')}
-                  disabled={!canNavigateNext}
-                  className="h-8 w-8 p-0"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-          </div>
+          <DialogTitle>
+            {client ? "Edit Client" : "Add New Client"}
+          </DialogTitle>
+          <DialogDescription>
+            {client
+              ? "Update client information and save changes."
+              : "Fill in the details to add a new client to your CRM."}
+          </DialogDescription>
         </DialogHeader>
+
+        {client && onNavigate && (
+          <div className="flex items-center justify-center gap-3 py-2 border-b">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onNavigate('prev')}
+              disabled={!canNavigatePrev}
+              className="flex items-center gap-2"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Previous
+            </Button>
+            <span className="text-sm text-muted-foreground">Navigate Records</span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onNavigate('next')}
+              disabled={!canNavigateNext}
+              className="flex items-center gap-2"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
