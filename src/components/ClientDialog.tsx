@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Client } from "@/data/mockClients";
 import { Button } from "@/components/ui/button";
@@ -20,12 +19,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ClientDialogProps {
   client: Client | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (client: Omit<Client, "id">) => void;
+  onNavigate?: (direction: 'prev' | 'next') => void;
+  canNavigatePrev?: boolean;
+  canNavigateNext?: boolean;
 }
 
 export const ClientDialog = ({
@@ -33,6 +36,9 @@ export const ClientDialog = ({
   isOpen,
   onOpenChange,
   onSave,
+  onNavigate,
+  canNavigatePrev = false,
+  canNavigateNext = false,
 }: ClientDialogProps) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -87,14 +93,42 @@ export const ClientDialog = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {client ? "Edit Client" : "Add New Client"}
-          </DialogTitle>
-          <DialogDescription>
-            {client
-              ? "Update client information and save changes."
-              : "Fill in the details to add a new client to your CRM."}
-          </DialogDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <DialogTitle>
+                {client ? "Edit Client" : "Add New Client"}
+              </DialogTitle>
+              <DialogDescription>
+                {client
+                  ? "Update client information and save changes."
+                  : "Fill in the details to add a new client to your CRM."}
+              </DialogDescription>
+            </div>
+            {client && onNavigate && (
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onNavigate('prev')}
+                  disabled={!canNavigatePrev}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onNavigate('next')}
+                  disabled={!canNavigateNext}
+                  className="h-8 w-8 p-0"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -41,13 +41,11 @@ const Index = () => {
       return matchesSearch && matchesStatus && matchesCompany;
     });
 
-    // Apply sorting
     if (sortField) {
       filtered.sort((a, b) => {
         let aValue: any = a[sortField];
         let bValue: any = b[sortField];
 
-        // Handle different data types
         if (sortField === 'value') {
           aValue = Number(aValue);
           bValue = Number(bValue);
@@ -97,9 +95,35 @@ const Index = () => {
     setIsClientDialogOpen(true);
   };
 
+  const handleNavigateRecord = (direction: 'prev' | 'next') => {
+    if (!selectedClient) return;
+
+    const currentIndex = filteredAndSortedClients.findIndex(
+      (client) => client.id === selectedClient.id
+    );
+
+    if (direction === 'prev' && currentIndex > 0) {
+      setSelectedClient(filteredAndSortedClients[currentIndex - 1]);
+    } else if (direction === 'next' && currentIndex < filteredAndSortedClients.length - 1) {
+      setSelectedClient(filteredAndSortedClients[currentIndex + 1]);
+    }
+  };
+
+  const getNavigationState = () => {
+    if (!selectedClient) return { canNavigatePrev: false, canNavigateNext: false };
+
+    const currentIndex = filteredAndSortedClients.findIndex(
+      (client) => client.id === selectedClient.id
+    );
+
+    return {
+      canNavigatePrev: currentIndex > 0,
+      canNavigateNext: currentIndex < filteredAndSortedClients.length - 1,
+    };
+  };
+
   const handleSaveClient = (clientData: Omit<Client, "id">) => {
     if (selectedClient) {
-      // Update existing client
       setClients((prev) =>
         prev.map((client) =>
           client.id === selectedClient.id
@@ -108,7 +132,6 @@ const Index = () => {
         )
       );
     } else {
-      // Add new client
       const newClient: Client = {
         ...clientData,
         id: Math.max(...clients.map((c) => c.id)) + 1,
@@ -130,6 +153,8 @@ const Index = () => {
       setClientToDelete(null);
     }
   };
+
+  const { canNavigatePrev, canNavigateNext } = getNavigationState();
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -167,6 +192,9 @@ const Index = () => {
           isOpen={isClientDialogOpen}
           onOpenChange={setIsClientDialogOpen}
           onSave={handleSaveClient}
+          onNavigate={handleNavigateRecord}
+          canNavigatePrev={canNavigatePrev}
+          canNavigateNext={canNavigateNext}
         />
 
         <DeleteConfirmDialog
