@@ -39,7 +39,7 @@ export const ClientDialog = ({
     email: "",
     phone: "",
     company: "",
-    status: "Prospect" as const,
+    status: "Prospect" as "Active" | "Inactive" | "Prospect",
     lastContact: "",
     value: 0,
     notes: "",
