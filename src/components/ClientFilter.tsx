@@ -60,7 +60,7 @@ export const ClientFilter = ({ filters, onFiltersChange }: ClientFilterProps) =>
                 <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All statuses</SelectItem>
+                <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Inactive">Inactive</SelectItem>
                 <SelectItem value="Prospect">Prospect</SelectItem>

@@ -29,7 +29,7 @@ const Index = () => {
       const matchesSearch =
         client.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         client.email.toLowerCase().includes(filters.search.toLowerCase());
-      const matchesStatus = !filters.status || client.status === filters.status;
+      const matchesStatus = !filters.status || filters.status === "all" || client.status === filters.status;
       const matchesCompany =
         !filters.company ||
         client.company.toLowerCase().includes(filters.company.toLowerCase());
