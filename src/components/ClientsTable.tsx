@@ -11,7 +11,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash } from "lucide-react";
+import { Trash, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+
+type SortField = 'name' | 'company' | 'email' | 'status' | 'value' | 'lastContact';
+type SortDirection = 'asc' | 'desc';
 
 interface ClientsTableProps {
   clients: Client[];
@@ -21,6 +24,9 @@ interface ClientsTableProps {
   totalPages: number;
   onPageChange: (page: number) => void;
   totalClients: number;
+  sortField: SortField | null;
+  sortDirection: SortDirection;
+  onSort: (field: SortField) => void;
 }
 
 export const ClientsTable = ({
@@ -31,6 +37,9 @@ export const ClientsTable = ({
   totalPages,
   onPageChange,
   totalClients,
+  sortField,
+  sortDirection,
+  onSort,
 }: ClientsTableProps) => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -52,6 +61,25 @@ export const ClientsTable = ({
     }
   };
 
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4" />;
+    }
+    return sortDirection === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
+  };
+
+  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
+    <TableHead 
+      className="cursor-pointer select-none hover:bg-gray-50" 
+      onClick={() => onSort(field)}
+    >
+      <div className="flex items-center gap-2">
+        {children}
+        {getSortIcon(field)}
+      </div>
+    </TableHead>
+  );
+
   return (
     <Card>
       <CardHeader>
@@ -67,12 +95,12 @@ export const ClientsTable = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Value</TableHead>
-                <TableHead>Last Contact</TableHead>
+                <SortableHeader field="name">Name</SortableHeader>
+                <SortableHeader field="company">Company</SortableHeader>
+                <SortableHeader field="email">Email</SortableHeader>
+                <SortableHeader field="status">Status</SortableHeader>
+                <SortableHeader field="value">Value</SortableHeader>
+                <SortableHeader field="lastContact">Last Contact</SortableHeader>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
             </TableHeader>

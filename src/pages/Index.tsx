@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { ClientsTable } from "@/components/ClientsTable";
 import { ClientFilter } from "@/components/ClientFilter";
@@ -8,6 +7,9 @@ import { mockClients, Client } from "@/data/mockClients";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 
+type SortField = 'name' | 'company' | 'email' | 'status' | 'value' | 'lastContact';
+type SortDirection = 'asc' | 'desc';
+
 const Index = () => {
   const [clients, setClients] = useState<Client[]>(mockClients);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -15,6 +17,8 @@ const Index = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const [filters, setFilters] = useState({
     search: "",
     status: "",
@@ -23,9 +27,9 @@ const Index = () => {
 
   const itemsPerPage = 10;
 
-  // Filter clients based on current filters
-  const filteredClients = useMemo(() => {
-    return clients.filter((client) => {
+  // Filter and sort clients
+  const filteredAndSortedClients = useMemo(() => {
+    let filtered = clients.filter((client) => {
       const matchesSearch =
         client.name.toLowerCase().includes(filters.search.toLowerCase()) ||
         client.email.toLowerCase().includes(filters.search.toLowerCase());
@@ -36,12 +40,52 @@ const Index = () => {
 
       return matchesSearch && matchesStatus && matchesCompany;
     });
-  }, [clients, filters]);
+
+    // Apply sorting
+    if (sortField) {
+      filtered.sort((a, b) => {
+        let aValue: any = a[sortField];
+        let bValue: any = b[sortField];
+
+        // Handle different data types
+        if (sortField === 'value') {
+          aValue = Number(aValue);
+          bValue = Number(bValue);
+        } else if (sortField === 'lastContact') {
+          aValue = new Date(aValue);
+          bValue = new Date(bValue);
+        } else {
+          aValue = String(aValue).toLowerCase();
+          bValue = String(bValue).toLowerCase();
+        }
+
+        if (aValue < bValue) {
+          return sortDirection === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortDirection === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [clients, filters, sortField, sortDirection]);
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedClients.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedClients = filteredClients.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedClients = filteredAndSortedClients.slice(startIndex, startIndex + itemsPerPage);
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting
+  };
 
   const handleClientClick = (client: Client) => {
     setSelectedClient(client);
@@ -112,7 +156,10 @@ const Index = () => {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
-          totalClients={filteredClients.length}
+          totalClients={filteredAndSortedClients.length}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={handleSort}
         />
 
         <ClientDialog
